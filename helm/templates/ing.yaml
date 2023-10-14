@@ -1,26 +1,18 @@
-{{- if .Values.ingress.enabled }}
----
-
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
-apiVersion: networking.k8s.io/v1beta1
-{{ else }}
 apiVersion: networking.k8s.io/v1
-{{ end -}}
 kind: Ingress
 metadata:
-  name: {{ template "fullname" . }}
-  labels:
-    draft: {{ default "draft-app" .Values.draft }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: minimal-ingress
   annotations:
-    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  ingressClassName: nginx-example
   rules:
   - http:
       paths:
-      - backend:
-          serviceName: {{ template "fullname" . }}
-          servicePort: 80
-    host: {{ .Values.ingress.host }}
-{{- end}}
-
+      - path: /testpath
+        pathType: Prefix
+        backend:
+          service:
+            name: test
+            port:
+              number: 80
